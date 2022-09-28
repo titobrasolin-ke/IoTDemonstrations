@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 ## Copyright (c) Microsoft. All rights reserved.
 ## Licensed under the MIT license. See LICENSE file in the project root for full license information.
@@ -95,9 +95,9 @@ log_err()
 # Checks that prerequisites are available.
 check_prereqs()
 {
-    local prereqs=("openssl" "curl")
+    local prereqs='openssl curl'
 
-    for p in "${prereqs[@]}"; do
+    for p in $prereqs; do
         if ! [ -x "$(command -v "$p")" ]; then
             echo "$p missing. Please install before proceeding."
             exit 1
@@ -230,12 +230,12 @@ check_args()
 
         auth_option=""
         if [ -n "$auth_cert" ]; then
-            auth_option+="--cert $auth_cert"
+            auth_option="${auth_option}--cert $auth_cert"
         fi
 
         if [ -n "$auth_user" ]; then
             if [ -n "$auth_pass" ]; then
-                auth_option+=" --user $auth_user:$auth_pass"
+                auth_option="${auth_option} --user $auth_user:$auth_pass"
             else
                 log_err "Username provided, but missing --auth-pass."
                 help_docs
@@ -305,7 +305,7 @@ enroll_cert()
         exit 1
     fi
 
-    openssl base64 -d -in "$temp_dir/cert.p7" | \
+    openssl base64 -A -d -in "$temp_dir/cert.p7" | \
     openssl pkcs7 -inform DER -outform PEM -print_certs | \
     openssl x509 -out "$out_dir/$1.pem"
 
@@ -344,7 +344,7 @@ sign_device_id_cert()
     cat "$device_ca_cert" >> "$out_dir/device_id_cert.pem"
 }
 
-set -Eeo pipefail
+set -eo pipefail
 
 # Management of script's temporary directory.
 temp_dir="$(mktemp -d)"
